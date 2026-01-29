@@ -1,9 +1,9 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(title="AI SRT File Corrector")
 
-# Allow frontend to access backend (CORS)
+# Allow frontend calls from any domain (replace "*" with your site in production)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -12,18 +12,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {"message": "Welcome to AI SRT Fixer!"}
+
 @app.post("/fix-srt")
-async def fix_srt(
-    srt_file: UploadFile = File(...),
-    script_file: UploadFile = File(None)
-):
-    # Read SRT file
-    srt_content = (await srt_file.read()).decode("utf-8")
-
-    # Basic fix logic: remove empty lines and extra spaces
-    lines = [line.strip() for line in srt_content.split("\n") if line.strip() != ""]
-    fixed_srt = "\n".join(lines)
-
-    # Optional: you can later use script_file for advanced fixes
-
-    return {"fixed_srt": fixed_srt}
+async def fix_srt(srt_file: UploadFile = File(...)):
+    # Dummy correction for testing
+    content = await srt_file.read()
+    fixed_content = content.decode("utf-8").replace("badword", "goodword")
+    return {"fixed_srt": fixed_content}
